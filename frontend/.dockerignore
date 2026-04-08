@@ -1,23 +1,14 @@
 # Ignorer les dépendances locales
 node_modules
-npm-debug.log
-yarn-error.log
+
+# Ignorer les fichiers de build locaux
+.next
+dist
 
 # Ignorer les fichiers de contrôle de version
 .git
 .gitignore
 
-# Ignorer les fichiers de configuration locaux
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Ignorer les fichiers système
-.DS_Store
-Thumbs.db
-
-# Ignorer les caches et builds locaux
-dist
+# Ignorer les logs et caches
+*.log
 .cache
