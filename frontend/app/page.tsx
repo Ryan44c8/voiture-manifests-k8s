@@ -5,7 +5,7 @@ import Dashboard from "@/components/Dashboard";
 
 const Home: React.FC = () => {
   return (
-    <div>
+    <div><h1>Welcome to the Home Page</h1>
       <Register />
       <Login />
       <Dashboard />
