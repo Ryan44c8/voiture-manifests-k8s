@@ -25,7 +25,7 @@ WORKDIR /app
 # Copier uniquement le build et les fichiers nécessaires
 COPY --from=build /app/package*.json ./
 COPY --from=build /app/.next ./.next
-COPY --from=build /app/public ./public
+#COPY --from=build /app/public ./public
 
 # Installer uniquement les dépendances de production
 RUN npm ci --omit=dev
