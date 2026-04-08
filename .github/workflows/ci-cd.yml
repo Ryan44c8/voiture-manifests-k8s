@@ -1,0 +1,56 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  # 1. Build
+  build:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm install --prefix frontend
+
+      - name: Build Next.js
+        run: npm run build --prefix frontend
+
+      - name: Build Docker images
+        run: docker-compose build
+
+  # 2. Tests
+  test:
+    runs-on: self-hosted
+    needs: build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+
+      - name: Run frontend tests
+        run: npm test --prefix frontend
+
+  # 3. Déploiement
+  deploy:
+    runs-on: self-hosted
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy services with Docker Compose
+        run: |
+          docker-compose -f docker-compose.yml down
+          docker-compose -f docker-compose.yml up -d --build
