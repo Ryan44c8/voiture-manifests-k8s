@@ -13,7 +13,7 @@ RUN npm ci
 COPY . .
 
 # Construire l'application Next.js
-RUN npm run build --webpack
+RUN npm run build
 
 # Étape 2 : Runtime
 FROM node:20-alpine AS runtime
@@ -25,7 +25,7 @@ RUN apk add --no-cache libc6-compat
 # Copier uniquement le build et les fichiers nécessaires
 COPY --from=build /app/package*.json ./
 COPY --from=build /app/.next ./.next
-#COPY --from=build /app/public ./public
+COPY --from=build /app/public ./public
 
 # Installer uniquement les dépendances de production
 RUN npm ci --omit=dev && npm cache clean --force

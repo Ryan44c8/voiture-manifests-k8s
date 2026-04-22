@@ -5,15 +5,22 @@ on:
     branches: [ "main" ]
 
 jobs:
-  # 1. Build
+  # 1. Build & Push
   build:
     runs-on: self-hosted
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Build Docker images
-        run: docker-compose build
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ secrets.GHCR_USERNAME }} --password-stdin
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: true
+          tags: ghcr.io/${{ secrets.GHCR_USERNAME }}/voiture-frontend:latest
 
   # 2. Tests
   test:
@@ -23,10 +30,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Run frontend tests inside container
-        run: docker-compose run --rm frontend npm test
+      - name: Run frontend tests
+        run: |
+          docker run --rm ghcr.io/${{ secrets.GHCR_USERNAME }}/voiture-frontend:latest npm test
 
-  # 3. Déploiement
+  # 3. Déploiement sur k3s
   deploy:
     runs-on: self-hosted
     needs: test
@@ -34,7 +42,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Deploy services with Docker Compose
+      - name: Configure kubectl
         run: |
-          docker-compose -f docker-compose.yml down
-          docker-compose -f docker-compose.yml up -d --build
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBECONFIG_DATA }}" > $HOME/.kube/config
+
+      - name: Deploy to k3s
+        run: kubectl apply -f k8s/
