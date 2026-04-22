@@ -26,6 +26,7 @@ RUN apk add --no-cache libc6-compat
 COPY --from=build /app/package*.json ./
 COPY --from=build /app/.next ./.next
 #COPY --from=build /app/public ./public
+# Copier les fichiers de configuration nécessaires
 
 # Installer uniquement les dépendances de production
 RUN npm ci --omit=dev && npm cache clean --force
