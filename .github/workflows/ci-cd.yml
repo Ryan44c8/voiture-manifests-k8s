@@ -34,7 +34,7 @@ jobs:
         run: |
           docker run --rm ghcr.io/${{ secrets.GHCR_USERNAME }}/voiture-frontend:latest npm test
 
-  # 3. Déploiement sur k3s
+    # 3. Déploiement sur k3s
   deploy:
     runs-on: self-hosted
     needs: test
@@ -49,6 +49,9 @@ jobs:
 
       - name: Test cluster access
         run: kubectl get nodes
+
+      - name: Create namespace first
+        run: kubectl apply -f k8s/namespace.yaml
 
       - name: Deploy to k3s
         run: kubectl apply -f k8s/
